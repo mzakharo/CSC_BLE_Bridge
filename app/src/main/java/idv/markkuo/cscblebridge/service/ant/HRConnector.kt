@@ -3,11 +3,24 @@ package idv.markkuo.cscblebridge.service.ant
 import android.content.Context
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc
+import com.dsi.ant.plugins.antplus.pccbase.AsyncScanController
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle
 
 class HRConnector(context: Context, listener: DeviceManagerListener<AntDevice.HRDevice>): AntDeviceConnector<AntPlusHeartRatePcc, AntDevice.HRDevice>(context, listener) {
+
+    private var scanCtx: AsyncScanController<AntPlusHeartRatePcc>? = null;
     override fun requestAccess(context: Context, resultReceiver: AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc>, stateChangedReceiver: AntPluginPcc.IDeviceStateChangeReceiver, deviceNumber: Int): PccReleaseHandle<AntPlusHeartRatePcc> {
         return AntPlusHeartRatePcc.requestAccess(context, deviceNumber, 0, resultReceiver, stateChangedReceiver)
+    }
+
+    override fun startScan(context: Context, scanReceiver : AsyncScanController.IAsyncScanResultReceiver) {
+        scanCtx = AntPlusHeartRatePcc.requestAsyncScanController(context, 0, scanReceiver);
+    }
+
+    override fun stopScan() {
+        scanCtx?.closeScanController();
+        scanCtx = null;
+
     }
 
     override fun subscribeToEvents(pcc: AntPlusHeartRatePcc) {

@@ -1,6 +1,7 @@
 package idv.markkuo.cscblebridge.service
 
 import android.app.*
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -39,8 +40,13 @@ class MainService : Service() {
         startServiceInForeground()
         bridge.startup(this) {
             val newDevices = bridge.antDevices.values.toList()
-            listeners.forEach {
-                it.onDevicesUpdated(newDevices, bridge.selectedDevices)
+            if (newDevices.isEmpty()) {
+                listeners.forEach { it.onDevicesUpdated(emptyList(), emptyMap()) }
+            }
+            else {
+                listeners.forEach {
+                    it.onDevicesUpdated(newDevices, bridge.selectedDevices)
+                }
             }
         }
         listeners.forEach { it.searching(true) }
@@ -82,7 +88,7 @@ class MainService : Service() {
     private fun startServiceInForeground() {
         val intent = Intent(this, MainService::class.java)
         intent.action = STOP_SELF_ACTION
-        val stopPendingIntent = PendingIntent.getService(this, 0, intent, 0)
+        val stopPendingIntent = PendingIntent.getService(this, 0, intent, FLAG_IMMUTABLE)
         val stopAction = NotificationCompat.Action(R.drawable.ic_baseline_stop_24, "Stop", stopPendingIntent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

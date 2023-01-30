@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import idv.markkuo.cscblebridge.R
 import idv.markkuo.cscblebridge.service.ant.AntDevice
@@ -33,10 +34,10 @@ class AntDeviceView @JvmOverloads constructor(
     fun bind(antDevice: AntDevice, isSelected: Boolean, onClickListener: (antDevice: AntDevice) -> Unit) {
         val color = if (isSelected) {
             broadcastButtonView.setState(BroadcastButtonView.BroadcastButtonViewState.Broadcasting)
-            context.resources.getColor(android.R.color.holo_blue_dark)
+            ContextCompat.getColor(context, android.R.color.holo_blue_dark)
         } else {
             broadcastButtonView.setState(BroadcastButtonView.BroadcastButtonViewState.NotSelected)
-            context.resources.getColor(android.R.color.black)
+            ContextCompat.getColor(context, android.R.color.black)
         }
 
         nameView.text = antDevice.deviceName

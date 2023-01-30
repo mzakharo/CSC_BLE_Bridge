@@ -1,6 +1,11 @@
 package idv.markkuo.cscblebridge.service.ant
 
+//import java.time.Instant
+//import java.time.LocalDate
+import android.os.SystemClock
 import idv.markkuo.cscblebridge.service.ble.BleServiceType
+import java.text.SimpleDateFormat
+import java.util.*
 
 sealed class AntDevice(val deviceId: Int, val deviceName: String, val typeName: String, val bleType: BleServiceType) {
     data class BsdDevice(
@@ -49,9 +54,11 @@ sealed class AntDevice(val deviceId: Int, val deviceName: String, val typeName: 
             private val name: String,
             var hr: Int,
             var hrTimestamp: Long
-    ) : AntDevice(id, name, "ANT+ Heart Rate", BleServiceType.HrService) {
-        override fun getDataString(): String {
-            return "Heart Rate: $hr"
+    ) : AntDevice(id, name, "ANT+ Heart Rate. ID: $id", BleServiceType.HrService) {
+       override fun getDataString(): String {
+            val ts =  Date(System.currentTimeMillis() - SystemClock.elapsedRealtime() + hrTimestamp);
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            return "Heart Rate: $hr. ts: ${sdf.format(ts)}"
         }
     }
 
