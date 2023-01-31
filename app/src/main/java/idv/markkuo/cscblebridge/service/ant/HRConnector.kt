@@ -59,10 +59,21 @@ class HRConnector(context: Context, listener: DeviceManagerListener<AntDevice.HR
                 var sdnn = kotlin.math.sqrt(sdnnTotal / rrVals.size)
                 device.hrv = sdnn*/
                 var rmssdTotal : Double = 0.0;
+                var rmssdCount : Int = 0
                 for (i in 1 until rrVals.size) {
-                    rmssdTotal += (rrVals[i] - rrVals[i-1]).pow(2.0)
+                    var diff = rrVals[i] - rrVals[i-1]
+
+                    //remove train of consecutive identical values
+                    if (diff == 0.0) {
+                        continue
+                    }
+                    rmssdCount +=1
+                    rmssdTotal += (diff).pow(2.0)
                 }
-                var rmssd = kotlin.math.sqrt(rmssdTotal / (rrVals.size - 1))
+                if (rmssdCount == 0) {
+                    rmssdCount = 1
+                }
+                var rmssd = kotlin.math.sqrt(rmssdTotal / rmssdCount)
                 // from https://help.elitehrv.com/article/54-how-do-you-calculate-the-hrv-score
                 device.hrv = kotlin.math.ln(rmssd) / 6.5 * 100.0
             }
