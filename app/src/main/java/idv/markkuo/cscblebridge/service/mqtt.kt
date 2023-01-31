@@ -59,7 +59,7 @@ class MqttClient(private val context: Context) {
         try {
             val message = MqttMessage()
             message.payload = msg.toByteArray()
-            client.publish(topic, message.payload, 0, true)
+            client.publish(topic, message.payload, 0, false)
             Log.d(TAG, "$msg published to $topic")
         } catch (e: MqttException) {
             Log.d(TAG, "Error Publishing to $topic: " + e.message)
