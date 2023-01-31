@@ -16,7 +16,7 @@ class HRConnector(context: Context, listener: DeviceManagerListener<AntDevice.HR
     private var scanCtx: AsyncScanController<AntPlusHeartRatePcc>? = null;
     private var previousBeat : Long = 0;
     private var sPreviousBeatTime : BigDecimal = 0.toBigDecimal();
-    private var rrVals  =  ArrayDeque<Double>( 10)
+    private var rrVals  =  ArrayDeque<Double>()
     override fun requestAccess(context: Context, resultReceiver: AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc>, stateChangedReceiver: AntPluginPcc.IDeviceStateChangeReceiver, deviceNumber: Int): PccReleaseHandle<AntPlusHeartRatePcc> {
         return AntPlusHeartRatePcc.requestAccess(context, deviceNumber, 0, resultReceiver, stateChangedReceiver)
     }
@@ -36,10 +36,12 @@ class HRConnector(context: Context, listener: DeviceManagerListener<AntDevice.HR
             val device = getDevice(pcc)
             device.hr = computedHeartRate
             device.hrTimestamp = estTimestamp
-            //Log.d( "FOOBAR", "cnt $heartBeatCount  ts: $sBeatTime  tsp: $sPreviousBeatTime $flags state $dataState")
             if ((heartBeatCount - previousBeat) > 0L) {
                 //Section 5.3.6.3 https://err.no/tmp/ANT_Device_Profile_Heart_Rate_Monitor.pdf
                 var rr  = (sBeatTime - sPreviousBeatTime).toDouble() / (heartBeatCount - previousBeat) * 1000.0
+                if (rrVals.size >= 10){
+                    rrVals.removeFirst()
+                }
                 rrVals.add(rr)
             }
             if (rrVals.size > 2 ) {
