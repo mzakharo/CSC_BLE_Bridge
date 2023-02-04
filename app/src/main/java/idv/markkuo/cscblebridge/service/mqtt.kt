@@ -2,18 +2,13 @@ package idv.markkuo.cscblebridge.service
 import android.content.Context
 import android.util.Log
 import info.mqtt.android.service.MqttAndroidClient
-import org.eclipse.paho.client.mqttv3.IMqttActionListener
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
-import org.eclipse.paho.client.mqttv3.IMqttToken
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
+import org.eclipse.paho.client.mqttv3.*
 import org.eclipse.paho.client.mqttv3.MqttClient
-import org.eclipse.paho.client.mqttv3.MqttException
-import org.eclipse.paho.client.mqttv3.MqttMessage
 
 class MqttClient(private val context: Context) {
     val client by lazy {
         val clientId = MqttClient.generateClientId()
-        MqttAndroidClient(context, "tcp://nas.local:1883",
+        MqttAndroidClient(context, "tcp://192.168.50.96:1883",
                 clientId)
     }
 
@@ -24,7 +19,11 @@ class MqttClient(private val context: Context) {
     fun connect(topics: Array<String>? = null,
                 messageCallBack: ((topic: String, message: MqttMessage) -> Unit)? = null) {
         try {
-            client.connect()
+            var opts = MqttConnectOptions()
+            opts.isAutomaticReconnect = true
+            opts.maxReconnectDelay = 5000
+            opts.maxInflight = 10
+            client.connect(opts)
             client.setCallback(object : MqttCallbackExtended {
                 override fun connectComplete(reconnect: Boolean, serverURI: String) {
                     topics?.forEach {

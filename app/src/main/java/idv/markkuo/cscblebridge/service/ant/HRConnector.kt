@@ -67,15 +67,16 @@ class HRConnector(context: Context, listener: DeviceManagerListener<AntDevice.HR
                     if (diff == 0.0) {
                         continue
                     }
-                    rmssdCount +=1
+                    rmssdCount += 1
                     rmssdTotal += (diff).pow(2.0)
                 }
                 if (rmssdCount == 0) {
-                    rmssdCount = 1
+                    device.hrv = -1.0
+                } else {
+                    var rmssd = kotlin.math.sqrt(rmssdTotal / rmssdCount)
+                    // from https://help.elitehrv.com/article/54-how-do-you-calculate-the-hrv-score
+                    device.hrv = kotlin.math.ln(rmssd) / 6.5 * 100.0
                 }
-                var rmssd = kotlin.math.sqrt(rmssdTotal / rmssdCount)
-                // from https://help.elitehrv.com/article/54-how-do-you-calculate-the-hrv-score
-                device.hrv = kotlin.math.ln(rmssd) / 6.5 * 100.0
             }
             previousBeat = heartBeatCount
             sPreviousBeatTime = sBeatTime
